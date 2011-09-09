@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>demos</title>
+<style>
+canvas{
+	border:1px #0F9 solid;
+}
+</style>
+</head>
+
+<body bgcolor="#CC99FF">
+<hr/>
+<canvas id="canvas" height='600' width='800'> 
+Your browser doesn't support canvas element.
+</canvas>
+<hr />
+</body>
+<script type="text/javascript">
+try{
+	
+var canvas=document.getElementById('canvas');
+var ctx;
+try{
+	ctx=canvas.getContext('2d');
+	}catch(e){
+	alert('Your browser doesn\'t support canvas element.\nCause:'+e);
+	}
+
+
+function palette(left,top,num,size,ctx){
+	for(var r=0;r<num;r++){
+		for(var c=0;c<num;c++){
+			ctx.fillStyle="rgb("+parseInt(255-255/num*r)+","+parseInt(255-(255/num*c))+",0)";
+			ctx.fillRect(left+r*size,top+c*size,size,size);
+		}
+	}
+}
+palette(5,5,6,25,ctx);
+
+function gradientCircles(num,radius){
+	var padding=3;
+	radius+=padding;
+	for(var r=0;r<num;r++){
+		for(var c=0;c<num;c++){
+			ctx.strokeStyle="rgb(0,"+parseInt(255-255/num*r)+","+parseInt(255-(255/num*c))+")";
+			ctx.beginPath();
+			ctx.arc(160+radius+c*(2*radius),radius+r*(2*radius),radius-padding,0,2*Math.PI,true);
+			ctx.stroke();
+		}
+	}
+	
+}
+gradientCircles(6,10);
+
+function radialGradientCircles(){
+	ctx.fillStyle = '#FD0';  
+  ctx.fillRect(0+320,0,75,75);  
+  ctx.fillStyle = '#6C0';  
+  ctx.fillRect(75+320,0,75,75);  
+  ctx.fillStyle = '#09F';  
+  ctx.fillRect(0+320,75,75,75);  
+  ctx.fillStyle = '#F30';  
+  ctx.fillRect(75+320,75,75,75);  
+  ctx.fillStyle = '#000';  
+  
+  // set transparency value  
+  ctx.globalAlpha = 0.2;  
+  
+  // Draw semi transparent circles  
+  for (var i=0;i<7;i++){  
+      ctx.beginPath();  
+      ctx.arc(75+320,75,10+10*i,0,Math.PI*2,true);  
+      ctx.fill();  
+  }
+
+}
+radialGradientCircles();
+
+ctx.globalAlpha=1.0;
+// Draw background  
+  ctx.fillStyle = 'rgb(255,221,0)';  
+  ctx.fillRect(0,0+160,150,37.5);  
+  ctx.fillStyle = 'rgb(102,204,0)';  
+  ctx.fillRect(0,37.5+160,150,37.5);  
+  ctx.fillStyle = 'rgb(0,153,255)';  
+  ctx.fillRect(0,75+160,150,37.5);  
+  ctx.fillStyle = 'rgb(255,51,0)';  
+  ctx.fillRect(0,112.5+160,150,37.5);  
+  
+  // Draw semi transparent rectangles  
+  for (var i=0;i<10;i++){  
+    ctx.fillStyle = 'rgba(255,255,255,'+(i+1)/10+')';  
+    for (var j=0;j<4;j++){  
+      ctx.fillRect(5+i*14,5+j*37.5+160,14,27.5)  
+    }  
+  }  
+
+}catch(e){
+	var m='Error!';
+	for(var p in e){
+		m+='\n'+p+':'+e[p];
+	}
+	alert(m);
+}
+</script>
+
+</html>
