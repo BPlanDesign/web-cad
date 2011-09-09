@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>quadratic curve</title>
+<style>
+canvas{
+	border:1px #0F9 solid;
+}
+</style>
+</head>
+
+<body bgcolor="#CC99FF">
+<hr/>
+<canvas id="canvas" height='300'> 
+Your browser doesn't support canvas element.
+</canvas>
+<hr />
+</body>
+<script type="text/javascript">
+try{
+	
+var canvas=document.getElementById('canvas');
+var ctx;
+try{
+	ctx=canvas.getContext('2d');
+	}catch(e){
+		alert('Your browser doesn\'t support canvas element.\nCause:'+e);
+	}
+
+ctx.lineWidth=5;
+ctx.lineCap='square';
+ctx.strokeStyle='green';
+function begin(){
+	var startX=event.x;
+	var startY=event.y;
+	canvas.onmousemove=function(){
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		ctx.beginPath();
+		ctx.moveTo(startX,startY);
+		var endX=event.x;
+		var endY=event.y;
+		ctx.lineTo(event.x,event.y);
+		ctx.stroke();
+		canvas.onclick=function(){
+			canvas.onmousemove=function(){
+				ctx.clearRect(0,0,canvas.width,canvas.height);
+				ctx.beginPath();
+				ctx.moveTo(startX,startY);
+				ctx.quadraticCurveTo(event.x,event.y,endX,endY);
+				ctx.stroke();
+				canvas.onclick=function(){
+					canvas.onmousemove=null;
+					canvas.onclick=begin;
+				}
+			}
+		}
+	}
+}
+canvas.onclick=begin;
+}catch(e){
+	var m='Error!';
+	for(var p in e){
+		m+='\n'+p+':'+e[p];
+	}
+	alert(m);
+}
+</script>
+
+</html>

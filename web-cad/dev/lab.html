@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body onresize="showCoord()">  
+  
+  
+  HTML elements on most browsers will have:-
+
+offsetLeft
+offsetTop
+These specifiy the position of the element relative its nearest parent that has layout. This parent can often be accessed bif the offsetParent property.
+
+IE and FF3 have
+
+clientLeft
+clientTop
+These properties are less common, they specify an elements position with its parents client area (padded area is part of the client area but border and margin is not).
+
+link|flag
+answered Jan 14 '09 at 9:43
+AnthonyWJones
+51k33087
+up vote
+2
+down vote
+You might be better served by using a JavaScript framework, that has functions to return such information (and so much more!) in a browser-independant fashion. Here are a few:
+
+Prototype
+jQuery
+MooTools
+YUI (yahoo)
+With these frameworks, you could do something like: $('id-of-img').top to get the y-pixel co
+  <div id='w' style="background:#0CC;width:300px;height:300px"></div>
+   
+</body>
+
+<script type="text/javascript">
+function showCoord(){
+	var w=document.getElementById('w');
+	w.innerHTML='offsetTop:'+w.offsetTop;
+}
+
+</script>
+
+</html>

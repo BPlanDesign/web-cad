@@ -1,0 +1,159 @@
+<html>
+<head>
+<link rel="icon" href="../../favicon.ico" type="image/x-icon"/>
+<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WebDrawing</title>
+<link type="text/css" rel="stylesheet" href="css/colorPicker.css">
+<style>
+body,a{
+	color:white;
+}
+
+.app {
+	width:1245px;
+	border:1px #30F groove;
+	padding:2px;
+}
+.app canvas{
+	/*1245*0.618*/
+	width:760px;
+	height:600px;
+	border:3px silver outset;
+}
+.app div.control{
+	float:right;
+	width:470px;
+	border: 1px #040477 outset;
+	padding: 0;
+}
+.app div.control div{
+	margin: 0;
+	margin-top: -20px;
+	padding: 2px;
+}
+.app div.control div h4{
+	padding:2px;
+	background-color:rgba(4,4,119,0.7);
+	color: #C63;
+}
+</style>
+</head>
+
+<body bgcolor="#000">
+
+<div class="app" id="app">
+<div>
+<p>You're drawing:<strong id='currentShape'></strong></p>
+</div>
+<button onclick="ctx.setMode('view');">View</button>
+<button onclick="ctx.setMode('select');">Select</button>
+<button onclick="ctx.draw(hc.graphic.Line)">Line</button>
+<button onclick="ctx.draw(hc.graphic.Circle)">Circle</button>
+<button onclick="ctx.gBuilder=new hc.graphic.RectBuilder()">Rectangle</button>
+<button onclick="">Define radial gradient</button>
+<button onclick="">Set Color Stop</button><br />
+
+<br />
+
+<canvas id="canvasId"> 
+<p style="color:white; overflow: hidden;cursor:move">Your browser doesn't support <code>&lt;canvas&gt;</code> element. You can try the following browser to use this functionality:</p>
+<ol>
+<li><a href="http://www.firefox.com/">Firefox</a></li>
+<li><a href="http://www.google.com/chrome">Chrome</a></li>
+<li><a href="http://www.opera.com/download/">Opera</a></li>
+<li><a href="http://www.microsoft.com/">IE9</a></li>
+<li><a href="http://www.apple.com">Safari</a></li>
+</ol>
+</canvas>
+
+<div class="control">
+<div>
+<h4>Line Style</h4>
+Line width:<input onchange="ctx.drawable.style.lineWidth=this.value;" value="9" size="3" />
+<label>Line Cap:
+  <select onchange="ctx.drawable.style.lineCap=this.value;">
+    <option value="butt">butt</option>
+    <option value="round">round</option>
+    <option value="square">square</option>
+  </select>
+</label>
+<label>Line join:
+  <select onchange="ctx.drawable.style.lineJoin=this.value;">
+    <option value="miter">miter</option>
+    <option value="round">round</option>
+    <option value="bevel">bevel</option>
+  </select>
+</label>
+<label>miterLimit:
+  <input onchange="ctx.drawable.style.miterLimit=this.value;" value="10" size="3">
+</label> 
+</div>
+<div>
+  <h4>Style</h4> 
+<span>Fill:</span>
+	<button onclick="delete ctx.drawable.style.fillStyle; ctx.repaint();"/>Clear</button>
+	<label>Color:<input id="fillColor"/></label><br />
+<span>Out line:</span> 
+	<button onclick="delete ctx.drawable.style.strokeStyle; ctx.repaint();"/>Clear</button>
+	<label>Color:<input id="strokeColor"/></label>
+</div>
+
+
+<div>
+  <h4>Compositing</h4>
+   
+<span>Alpha transparent:</span> <input type="range" min='0' max='1' value="1" step='0.1' onchange="this.title=this.value;ctx.context2d.globalAlpha=this.value;" id="globalAlpha"/>
+<br />
+<label>
+Composite operation:
+	<select>
+		<option>source-atop</option>
+		<option>source-in</option>
+		<option>source-out</option>
+		<option>source-over</option>
+		<option>destination-atop</option>
+		<option>destination-in</option>
+		<option>destination-out</option>
+		<option>destination-over</option>
+		<option>lighter</option>
+		<option>copy</option>
+		<option>xor</option>
+		<option>vendorName-operationName</option>
+	</select>
+</label>
+</div>
+<canvas id='outline' title="Outline of the canvas." style="border:1px #CF0 solid;width:300px;height:300px;"></canvas>
+</div>
+</div>
+<hr />
+</body>
+<script src="js/core.js"></script>
+<script src="js/colorPicker.js"></script>
+<script src="js/graphics.js"></script>
+<script type="text/javascript">
+try{
+	var ctx=new hc.graphic.DrawingContext('canvasId');
+	
+	var picker=new hc.widget.ColorPicker();
+	picker.regist(fillColor);
+	picker.regist(strokeColor);
+	fillColor.onchange=function(){
+		ctx.drawable.style.fillStyle=this.value;
+		ctx.repaint();
+		console.log(event);
+	}
+	strokeColor.onchange=function(){
+		ctx.drawable.style.strokeStyle=this.value;
+		ctx.repaint();
+		console.log(event);
+	}
+}catch(e){
+	var m='Error!';
+	for(var p in e){
+		m+='\n'+p+':'+e[p];
+	}
+	alert(m);
+}
+</script>
+</html>

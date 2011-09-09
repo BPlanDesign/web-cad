@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/esl/favicon.ico" type="image/x-icon"/>
+<link rel="shortcut icon" href="/esl/favicon.ico" type="image/x-icon" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Gradient</title>
+<style>
+body,a{
+	color:white;
+}
+canvas{
+	border:1px #0F9 solid;
+}
+.pane{
+	display:inline-block;
+	border:1px #3CC solid;
+}
+</style>
+</head>
+
+<body bgcolor="#000">
+<div><a href="/esl">Home</a></div>
+
+<hr/>
+<div>
+<span>Tips:</span>
+<p>Press L to draw line, R to draw rectangle, C to draw circle.</p>
+<p>You're drawing:<strong id='currentShape'></strong></p>
+</div>
+<button onclick="ctx.gBuilder=new com.hc.graphic.LineBuilder()">Line</button>
+<button onclick="ctx.gBuilder=new com.hc.graphic.RectBuilder()">Rectangle</button>
+<button onclick="">Define radial gradient</button>
+<button onclick="">Set Color Stop</button>
+<div class="pane">
+<h4>Line Style</h4>
+Line width:<input onchange="ctx.context2d.lineWidth=this.value;" value="9" size="3" />
+<label>Line Cap:
+  <select onchange="ctx.context2d.lineCap=this.value;">
+    <option value="butt">butt</option>
+    <option value="round">round</option>
+    <option value="square">square</option>
+  </select>
+</label>
+<label>Line join:
+  <select onchange="ctx.context2d.lineJoin=this.value;">
+    <option value="miter">miter</option>
+    <option value="round">round</option>
+    <option value="bevel">bevel</option>
+  </select>
+</label>
+<label>miterLimit:
+  <input onchange="ctx.context2d.miterLimit=this.value;" value="10" size="3">
+</label> 
+</div>
+<div class="pane">
+  <h4>Style</h4> 
+<span>Fill:</span><label><input type="checkbox" onchange="ctx.gBuilder.graph.styles[0]=!this.checked;" checked="checked" />None;</label> 
+<label>Color:<input id="fillColor"/></label><br />
+<span>Out line:</span> <label><input type="checkbox" onchange="ctx.gBuilder.graph.styles[1]=!this.checked;" />None;</label> <label>Color:<input id="strokeColor"/></label>
+</div>
+
+
+<div class="pane">
+  <h4>Compositing</h4>
+   
+<span>Alpha transparent:</span> <input type="range" min='0' max='1' value="1" step='0.1' onchange="this.title=this.value;ctx.context2d.globalAlpha=this.value;" id="globalAlpha"/>
+</div>
+
+<br />
+
+<canvas id="canvas" width='768' height='768'> 
+
+<p style="color:white; overflow: hidden;">Your browser doesn't support <code>&lt;canvas&gt;</code> element. You can try the following browser to use this functionality:</p>
+<ol>
+<li><a href="http://www.firefox.com/">Firefox</a></li>
+<li><a href="http://www.google.com/chrome">Chrome</a></li>
+<li><a href="http://www.opera.com/download/">Opera</a></li>
+<li><a href="http://www.microsoft.com/">IE9</a></li>
+<li><a href="http://www.apple.com">Safari</a></li>
+</ol>
+</canvas>
+<hr />
+</body>
+<script src="/esl/js/core.js"></script>
+<script src="/esl/js/colorPicker.js"></script>
+<script src="/esl/js/graphics.js"></script>
+<script type="text/javascript">
+try{
+	
+	var ctx=new com.hc.graphic.DrawingContext('canvas');
+	//var strokeColor=document.getElementById('strokeColor');
+	
+	var picker=new com.hc.color.Picker();
+	picker.register('strokeColor',ctx.context2d,'strokeStyle');
+	picker.register('fillColor',ctx.context2d,'fillStyle');
+	ctx.context2d.strokeStyle='blue';
+	ctx.context2d.fillStyle='blue';
+
+/*
+	var com;alert(!com);
+var canvas=document.getElementById('canvas');
+canvas.onmousedown=function(evt){
+	com.hc.canvas.drawer.onMouseDown(evt);
+}
+canvas.onmousemove=com.hc.canvas.onMouseMove;
+canvas.onmouseup=com.hc.canvas.drawer.onMouse
+var ctx;
+try{
+	ctx=canvas.getContext('2d');
+	}catch(e){
+		alert('Your browser doesn\'t support canvas element.\nCause:'+e);
+	}
+ctx.strokeStyle='white';
+var circles;
+function defRGradient(){
+	circles=new Array();
+	clear();
+	function beginDrawCircle(evt){
+		var circle={};
+		circles.push(circle);
+		//find the circle center
+		circle.center=new cloud.Coordinate(evt).getCoordRelativeTo(canvas);
+		canvas.onmousemove=function(evt){
+			clear();
+			//calculate the circle radius
+			circle.radius=distance(circle.center,new cloud.Coordinate(evt).getCoordRelativeTo(canvas));
+			//draw all the circles
+			for(var i=0;i<circles.length;i++){
+				drawCircle(circles[i]);
+			}
+			if(circles.length==2){
+					var c1=circles[0].center;
+					var c2=circles[1].center;
+					ctx.beginPath();
+					ctx.moveTo(c1.x,c1.y);
+					ctx.lineTo(c2.x,c2.y);
+					ctx.stroke();
+				}
+				
+			canvas.onclick=function(){
+				//submit a circle
+				canvas.onmousemove=null;
+				if(circles.length==2){
+					return;
+				}
+				//continue to draw the next circle
+				canvas.onclick=beginDrawCircle;
+			}
+		}
+	}
+	canvas.onclick=beginDrawCircle;
+}
+
+function clear(){
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+function drawCircle(circle){
+	ctx.beginPath();
+	ctx.arc(circle.center.x,circle.center.y,circle.radius,0,2*Math.PI,true);
+	ctx.arc(circle.center.x,circle.center.y,2,0,2*Math.PI,true);
+	ctx.stroke();
+}
+function distance(c1,c2){
+	return Math.sqrt((c1.x-c2.x)*(c1.x-c2.x)+(c1.y-c2.y)*(c1.y-c2.y));
+}*/
+
+}catch(e){
+	var m='Error!';
+	for(var p in e){
+		m+='\n'+p+':'+e[p];
+	}
+	alert(m);
+}
+</script>
+
+</html>
