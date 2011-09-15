@@ -2,14 +2,14 @@ package('hc.widget');
 package('hc.color');
 
 hc.widget.ColorPicker=function(){
-	this.cols=16;	//number of cells in a row
+	//this.cols=16;	//number of cells in a row
 	this.defaultColor='#33cc00';
 	this.pallette=null;
 	
 	this.newPallette=function(){
 		if(this.pallette)
 			document.body.removeChild(this.pallette);
-		var cc=this.cols;	//cell count
+		//var cc=this.cols;	//cell count
 		var plt=document.createElement('div');
 		plt.className='pallette';
 		var colors=hc.color.Names;//[];//hc.color.RGBSamples;
@@ -20,8 +20,7 @@ hc.widget.ColorPicker=function(){
 			cell.onmousedown=hc.widget.ColorPicker.mousedownHandler;
 			cell.title=colors[i];
 			plt.appendChild(cell);
-			if((i+1)%cc==0)
-				plt.appendChild(document.createElement('br'));
+			
 		}
 		
 		this.pallette=plt;
@@ -38,7 +37,7 @@ hc.widget.ColorPicker=function(){
 		input.value=this.defaultColor;
 		input.onfocus=function(){
 			var s=this.picker.pallette.style;
-			s.left=this.offsetLeft+'px';
+			s.left=this.offsetLeft+'px';console.log(this.scrollY)
 			s.top=this.offsetTop+this.clientHeight+'px';
 			s.visibility='visible';
 			hc.widget.ColorPicker.curInput=this;

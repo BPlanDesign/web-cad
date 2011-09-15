@@ -1,7 +1,6 @@
 .pallette{
 	position:absolute;
-	left:0;
-	top:0;
+	width:300px;
 	border-right:2px blue dashed;
 	border-bottom:1px green solid;
 	visibility:hidden;

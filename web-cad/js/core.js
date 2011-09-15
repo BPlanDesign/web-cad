@@ -18,9 +18,10 @@ function package(ns){
 
 package('hc.geom');
 //calculate distance
-hc.geom.dist=function(p1,p2){
+hc.geom.dist=function(p1,p2){//console.log(p1,p2);
 	return Math.sqrt(Math.pow(p1.x-p2.x, 2)+Math.pow(p1.y-p2.y, 2));
 };
+
 /*
 function Matrix(m){
 	this.matrix=m;
