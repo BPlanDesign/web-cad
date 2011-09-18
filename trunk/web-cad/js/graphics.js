@@ -15,6 +15,11 @@ package('hc.graphic');
  */
 hc.graphic.DrawingContext = function(canvasContainer) {
 	//preprocess
+	canvasContainer.addEventListener('selectstart',function(evt){
+		//console.log(evt.type,evt.currentTarget, evt.target, evt.eventPhase, evt);
+		evt.preventDefault();
+		evt.stopPropagation();
+		},true);
 	var canvases=canvasContainer.getElementsByTagName('canvas');
 	var tcv=canvases[0];	//top canvas
 	var mcv=canvases[1]; //model canvas
@@ -397,7 +402,7 @@ hc.graphic.DrawingContext.lstn = {
 				x : t.x,
 				y : t.y
 			};// start position
-			console.log('start drag');
+			//console.log('start drag');
 		},
 		onDrag : function(ctx) {  //console.log(this.sT);
 			if(!this.sT)
@@ -483,14 +488,8 @@ hc.graphic.DrawingContext.lstn = {
 			var src=evt.target; //console.log(evt, {e:src});
 			//1 calculate the current mouse position for app use
 			var l=ctx.loc;
-			if (evt.offsetX) {
-				l.x = evt.offsetX;
-				l.y = evt.offsetY;
-			} else {
-				l.x = evt.layerX;
-				l.y = evt.layerY;
-				 //console.warn('The mouse position is calculated..');
-			}
+			l.x=evt.layerX || evt.offsetX;
+			l.y=evt.layerY || evt.offsetY;
 			
 			//2 the current mouse location in the drawable coordinate
 			var crd=ctx.crd;
