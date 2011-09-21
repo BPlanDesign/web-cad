@@ -16,7 +16,7 @@ package('hc.graphic');
 hc.graphic.DrawingContext = function(canvasContainer) {
 	//preprocess
 	canvasContainer.addEventListener('selectstart',function(evt){
-		//console.log(evt.type,evt.currentTarget, evt.target, evt.eventPhase, evt);
+		//console.log(evt.type,evt.timeStamp);
 		evt.preventDefault();
 		evt.stopPropagation();
 		},true);
@@ -40,7 +40,7 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	this.drawable = null; // c:Drawble; the current focused drawable
 	this.ctrlRings = []; // c:ControlRing subclass of Circle set of circles,// exist when editing
 	this.hoverRing = null; // Ring index
-	this.lstns =[hc.graphic.DrawingContext.lstn.coordProvider, hc.graphic.DrawingContext.lstn.scaler,hc.graphic.DrawingContext.lstn.mover];//!!! only the last listener is changable, this.constructor.lstn.viewer;
+	this.lstns =[hc.graphic.DrawingContext.lstn.coordProvider, hc.graphic.DrawingContext.lstn.scaler,hc.graphic.DrawingContext.lstn.mover, hc.graphic.DrawingContext.lstn.selector];//!!! only the last listener is changable, this.constructor.lstn.viewer;
 	this.drawLstnIndex=this.lstns.length;
 	//this.dragStartLoc = null; // dragging start position stored in canvas html element
 	this.scale = 1;// translate and scale
@@ -49,7 +49,7 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	this.loc = {x : 0,y : 0};	//The mouse location in original UI coordination, reference will not be modified
 	this.crd = {x : 0,y : 0};	//The coordinate after transformed, reference will not be modified
 	this.updateModel=false;	//request to repaint model
-	this.updateTop=false;	//request to repaint top canvas
+//	this.updateTop=false;	//request to repaint top canvas
 	//hooks
 	this.onCursorMove=function(x,y){
 		console.log('Current coordination:'+x+','+y);
@@ -124,8 +124,8 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		
 		//2 paint origin location
 		var len=80;
-		var off=10;
-		c.translate(off, off); //console.log('translating..');
+	//	var off=10;
+	//	c.translate(off, off); //console.log('translating..');
 		c.beginPath();
 		c.moveTo(0,len);
 		c.lineTo(0,0);
@@ -454,26 +454,18 @@ hc.graphic.DrawingContext.lstn = {
 			 * find the drawble under the mouse if not drawing and change the
 			 * style of this drawable
 			 */
-			var ctx2d = ctx.canvas.getContext('2d');
-			var prv = ctx.drawable;
-			delete ctx.drawable;
-			var nHover;
+			var ctx2d = ctx.topContext2d;
+			
 			var ds = ctx.drawables;
-			for ( var i in ds) {// console.log(ctx.drawables[i],'contains',ctx.loc,':',ctx.drawables[i].isPointIn(ctx.loc,
-								// ctx2d));
+			for ( var i in ds) {
 				if (ds[i].isPointIn(ctx.crd, ctx2d)) {
-					nHover = ds[i];
+					ctx.transformTop();
+					ctx2d.lineWidth=2;
+					ds[i].draw(ctx2d,{strokeStyle:'blue'});
+					//console.log('hovering');
+					ctx2d.restore();
 					break;
 				}
-			}
-			ctx.drawable = nHover;
-			// hover the drawable or not
-			if (nHover != prv) {
-				if (prv)
-					delete prv.altStyle;
-				if (nHover)
-					nHover.altStyle = hc.graphic.Drawable.styles.hover;
-				ctx.repaint();
 			}
 		},
 		onMousedown : function(ctx) {
@@ -567,14 +559,14 @@ hc.graphic.Drawable = function() {
 	this.style = {
 		strokeStyle : 'pink'
 	};
-	this.altStyle = {}; // not to stored
+	//this.altStyle = {}; // not to stored
 	this.styles = hc.graphic.Drawable.styles;
 	// called by sub
-	this.draw = function(ctx2d) {//console.log(this);
+	this.draw = function(ctx2d,altStyle) {//console.log(this);
 		ctx2d.beginPath();
 		this.path(ctx2d);
 		//ctx2d.closePath();
-		this.styles.apply(this.style, ctx2d, this.altStyle);
+		this.styles.apply(this.style, ctx2d, altStyle);
 		if (this.style.strokeStyle) {
 			//console.log('stroke '+this.constructor.name+' :'+ctx2d.strokeStyle);
 			ctx2d.stroke();
