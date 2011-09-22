@@ -64,7 +64,7 @@ hc.graphic.Circle.creator = {
 		this.cp.draw(ctx.topContext2d);
 		this.center={x:ctx.crd.x, y:ctx.crd.y};
 	},
-	onDrag : function(ctx) {console.log('dragging');
+	onDrag : function(ctx) {//console.log('dragging');
 		var c=this.circle;
 		c.radius=hc.geom.dist(c.center, ctx.loc);//console.log('radius'+c.radius);
 		c.draw(ctx.topContext2d);

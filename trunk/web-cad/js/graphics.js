@@ -37,18 +37,18 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	this.modelContext2d=mcv.getContext('2d'); //model canvas to draw the stored drawables
 //	this.tmpContext2d=tmcv.getContext('2d');
 	this.drawables = []; // c:Drawble; holds all the 
-	this.drawable = null; // c:Drawble; the current focused drawable
+	this.selected = []; // c:Drawble; the current focused drawable
 	this.ctrlRings = []; // c:ControlRing subclass of Circle set of circles,// exist when editing
-	this.hoverRing = null; // Ring index
-	this.lstns =[hc.graphic.DrawingContext.lstn.coordProvider, hc.graphic.DrawingContext.lstn.scaler,hc.graphic.DrawingContext.lstn.mover, hc.graphic.DrawingContext.lstn.selector];//!!! only the last listener is changable, this.constructor.lstn.viewer;
-	this.drawLstnIndex=this.lstns.length;
+	this.lstns =[hc.graphic.DrawingContext.lstn.coordProvider, hc.graphic.DrawingContext.lstn.scaler,hc.graphic.DrawingContext.lstn.mover, hc.graphic.DrawingContext.lstn.editor];//!!! only the last listener is changable, this.constructor.lstn.viewer;
+	this.drawLstnIndex=this.lstns.length-1;
+	this.editStyle={strokeStyle:'green'};
 	//this.dragStartLoc = null; // dragging start position stored in canvas html element
 	this.scale = 1;// translate and scale
 	this.scaleRange={min:0.2, max:20};
 	this.translate = {x : 0, y : 0	};
 	this.loc = {x : 0,y : 0};	//The mouse location in original UI coordination, reference will not be modified
 	this.crd = {x : 0,y : 0};	//The coordinate after transformed, reference will not be modified
-	this.updateModel=false;	//request to repaint model
+//	this.updateModel=false;	//request to repaint model
 //	this.updateTop=false;	//request to repaint top canvas
 	//hooks
 	this.onCursorMove=function(x,y){
@@ -61,12 +61,11 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	/**
 	 * will be called when moving, usually not to be called explicitly
 	 */
-	this.repaintTop=function(){
+	this.repaintTop=function(){//console.log("paint top");
 		var c = this.topContext2d;
 		var cv=c.canvas;
-		c.clearRect(0, 0, cv.width, cv.height);
-		c.gloabalAlpha=0.5;
-		c.strokeStyle = 'white';
+		c.clearRect(0, 0, cv.width, cv.height);//alert('cleared');
+		c.strokeStyle = 'rgba(255,255,255,0.6)';
 		// draw meter
 		var len = 15;
 		var dist = 25;
@@ -76,11 +75,12 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 			c.moveTo(x, 0);
 			c.lineTo(x, len);
 		}
-		//1 draw the vertical scale
+		//1 draw the vertical meter
 		for ( var y = 0; y <= cv.height; y += dist) {
 			c.moveTo(0, y);
 			c.lineTo(len, y);
 		}
+		//console.log('stroke meter:'+c.gloabalAlpha);
 		c.stroke();
 
 		//2 draw the current location with cross
@@ -91,6 +91,16 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		c.moveTo(l.x, 0);
 		c.lineTo(l.x, cv.height);
 		c.stroke();
+		
+		var sc=this.selected.length;//selected count
+		//console.log(sc);
+		if(sc>0){
+			this.transformTop();
+			for(var i=0; i < sc;i++){
+				this.selected[i].draw(c,this.editStyle);
+			}
+			c.restore();
+		}
 		
 		//3 draw control rings
 		for ( var i in this.ctrlRings) {
@@ -182,8 +192,10 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	 * 1 Drawing context state transform To drawinging pass drawable constructor
 	 * as the argument
 	 */
-	this.drawUsing = function(lstn) {//console.log(lstn);
+	this.drawUsing = function(lstn) {
+		this.exitEdit();
 		this.lstns[this.drawLstnIndex]=lstn;
+		//delete this.lstns.
 		delete tcv.title;
 		if(lstn.onCreate)
 			lstn.onCreate(this);
@@ -191,8 +203,8 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	
 	this.commit=function(d){
 		this.drawables.push(d);
-		delete this.lstns[this.drawLstnIndex];
 		this.repaintModel();
+		this.lstns[this.drawLstnIndex]=hc.graphic.DrawingContext.lstn.editor;
 	};
 
 	this.setMode = function(mode) {
@@ -211,18 +223,22 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		this.repaintModel();
 	};
 
-	// 4 modes
+	// 2 modes
 	this.getMode = function() {
 		switch (this.lstn) {
-		case this.constructor.lstn.viewer:
-			return 'view';
 		case this.constructor.lstn.editor:
 			return 'editing';
-		case this.constructor.lstn.selector:
-			return 'selecting';
 		default:
 			return 'drawing';
 		}
+	};
+	
+	this.exitEdit=function(){
+		if(this.selected.length==0)
+			return;
+		Array.prototype.push.apply(this.drawables,this.selected);
+		this.selected=[];
+		this.repaint();
 	};
 
 	/**
@@ -249,7 +265,12 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	 * 
 	 * @param event
 	 */
-	tcv.onmousemove = function(evt) {
+	tcv.onmousemove = function(evt) {//console.log('moving...');
+		if(this.moving){
+			console.warn('Already moving...');
+			return;
+		}
+		this.moving=true;
 		evt.preventDefault();
 		//evt.stopPropagation();
 		
@@ -258,15 +279,15 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		var lts=ctx.lstns;
 		var l;
 		for(var i in lts){
-			l=lts[i];
+			l=lts[i];//console.log(l.onMousemove);
 			if(l.onMousemove)
 				l.onMousemove(ctx,evt);
 			if(ctx.dragStartLoc && l.onDrag)
 				l.onDrag(ctx, evt);
 		}
-		//ctx.updateUI();
 		// update the coordinate label
 		ctx.onCursorMove(ctx.crd.x, ctx.crd.y);
+		this.moving=false;
 	};
 
 	tcv.onmousedown = function(evt) {
@@ -448,31 +469,44 @@ hc.graphic.DrawingContext.lstn = {
 			ctx.scaleBy(l.x,ctx.topContext2d.canvas.height - l.y, fac);
 		}
 	},
-	selector : {
+	
+	editor : {
+		hoverStyle:{strokeStyle:'blue'},
+		hovered:null,
 		onMousemove : function(ctx) {
 			/**
 			 * find the drawble under the mouse if not drawing and change the
 			 * style of this drawable
 			 */
 			var ctx2d = ctx.topContext2d;
-			
+			delete this.hovered;
 			var ds = ctx.drawables;
+			
 			for ( var i in ds) {
 				if (ds[i].isPointIn(ctx.crd, ctx2d)) {
 					ctx.transformTop();
-					ctx2d.lineWidth=2;
-					ds[i].draw(ctx2d,{strokeStyle:'blue'});
-					//console.log('hovering');
+					ctx2d.lineWidth=2/ctx.scale;
+					this.hovered=i;
+					ds[i].draw(ctx2d, this.hoverStyle);
 					ctx2d.restore();
 					break;
 				}
 			}
+			
 		},
 		onMousedown : function(ctx) {
-			if (ctx.drawable) {
-				ctx.edit(ctx.drawable);
-			}
+			if(!this.hovered)
+				return;
+			ctx.selected.push(ctx.drawables[this.hovered]);
+			delete ctx.drawables[this.hovered];
+			ctx.repaint();
+			this.onMousemove(ctx);
 		},
+		onKeyup:function(ctx,evt){
+			if(evt.keyCode==27){//Esc key
+				ctx.exitEdit();
+			}
+		}
 	},
 	//calculte the coordination from ui location and update ctx.crd, ctx.loc.
 	coordProvider:{
@@ -491,11 +525,9 @@ hc.graphic.DrawingContext.lstn = {
 			crd.y = src.height - l.y;
 			crd.y -= ctx.translate.y;
 			crd.y /= ctx.scale;
-			
-			ctx.updateTop=true;
 		}
 	},
-	editor : {
+	editor2 : {
 		onMousemove : function(ctx) {
 			/**
 			 * find the drawble under the mouse if not drawing and change the
