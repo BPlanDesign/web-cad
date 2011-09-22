@@ -51,13 +51,13 @@
 				<h4>Style</h4>
 				<span>Fill:</span>
 				<button
-					onclick="delete ctx.drawable.style.fillStyle; ctx.repaint();" >
+					onclick="clearFill()" >
 				Clear
 				</button>
 				<label>Color:<input id="fillColor" />
 				</label><br /> <span>Out line:</span>
 				<button
-					onclick="delete ctx.drawable.style.strokeStyle; ctx.repaint();" >
+					onclick="clearStroke();" >
 				Clear
 				</button>
 				<label>Color:<input id="strokeColor" />
@@ -139,19 +139,31 @@
 		}
 		
 		var picker = new hc.widget.ColorPicker();
-		var fce=document.getElementById('fillColor');
-		var sce=document.getElementById('strokeColor');
+		var fce=document.getElementById('fillColor');//fill color element
+		var sce=document.getElementById('strokeColor');//stroke color element
 		picker.regist(fce);
 		picker.regist(sce);
 		fce.onchange = function() {
-			ctx.drawable.style.fillStyle = this.value;
-			ctx.repaint();
-			console.log(event);
+			for(var i in ctx.selected){
+			ctx.selected[i].style.fillStyle=this.value;	
+			}
+			ctx.repaintTop();
 		}
 		sce.onchange = function() {
-			ctx.drawable.style.strokeStyle = this.value;
-			ctx.repaint();
-			console.log(event);
+			for(var i in ctx.selected){
+				ctx.selected[i].style.strokeStyle=this.value;	
+			}
+		}
+		function clearFill(){
+			for(var i in ctx.selected){
+				delete ctx.selected[i].style.fillStyle;
+				}
+				ctx.repaintTop();
+		}
+		function clearStroke(){
+			for(var i in ctx.selected){
+				delete ctx.selected[i].style.strokeStyle;
+				}
 		}
 	} catch (e) {
 		var m = 'Error!';
