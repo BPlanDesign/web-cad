@@ -1,4 +1,3 @@
-
 hc.graphic.Rectangle = function() {
 	hc.graphic.Drawable.call(this);
 	this.x = 0;
@@ -13,6 +12,7 @@ hc.graphic.Rectangle = function() {
 		return [];
 	};
 };
+
 hc.graphic.Rectangle.creator = {
 	onMousedown : function(ctx) {
 		this.x=ctx.crd.x;
@@ -29,7 +29,6 @@ hc.graphic.Rectangle.creator = {
 		e.w=Math.abs(this.x-p.x);
 		e.h=Math.abs(this.y-p.y);
 		ctx.transformTop();
-		//ctx.topContext2d.fillRect(p.x, p.y, 50, 50);
 		e.draw(ctx.topContext2d);
 		ctx.topContext2d.restore();
 	},
