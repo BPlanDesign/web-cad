@@ -41,7 +41,7 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 	this.ctrlRings = []; // c:ControlRing subclass of Circle set of circles,// exist when editing
 	this.lstns =[hc.graphic.DrawingContext.lstn.coordProvider, hc.graphic.DrawingContext.lstn.scaler,hc.graphic.DrawingContext.lstn.mover, hc.graphic.DrawingContext.lstn.editor];//!!! only the last listener is changable, this.constructor.lstn.viewer;
 	this.drawLstnIndex=this.lstns.length-1;
-	this.editStyle={strokeStyle:'green'};
+	this.editStyle={shadowColor:'green', shadowBlur:5};
 	//this.dragStartLoc = null; // dragging start position stored in canvas html element
 	this.scale = 1;// translate and scale
 	this.scaleRange={min:0.2, max:20};
@@ -96,7 +96,9 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		//console.log(sc);
 		if(sc>0){
 			this.transformTop();
+			//this.topContext2d.lineWidth=2/this.scale;
 			for(var i=0; i < sc;i++){
+				//this.editStyle.shadowColor=this.selected[i].style.strokeStyle;
 				this.selected[i].draw(c,this.editStyle);
 			}
 			c.restore();
@@ -471,7 +473,7 @@ hc.graphic.DrawingContext.lstn = {
 	},
 	
 	editor : {
-		hoverStyle:{strokeStyle:'blue'},
+		hoverStyle:{strokeStyle:'rgba(0,0,255,0.5)',shadowColor:'blue', shadowBlur:3},
 		hovered:null,
 		onMousemove : function(ctx) {
 			/**
@@ -485,7 +487,7 @@ hc.graphic.DrawingContext.lstn = {
 			for ( var i in ds) {
 				if (ds[i].isPointIn(ctx.crd, ctx2d)) {
 					ctx.transformTop();
-					ctx2d.lineWidth=2/ctx.scale;
+					ctx2d.lineWidth=1/ctx.scale;
 					this.hovered=i;
 					ds[i].draw(ctx2d, this.hoverStyle);
 					ctx2d.restore();
@@ -640,14 +642,13 @@ hc.graphic.Drawable.styles = {
 		// lineWidth : 1,
 		lineCap : 'round',// butt, round, square
 		lineJoin : 'round',// round, bevel, miter
-		miterLimit : 10
-	},
-	hover : {
-		strokeStyle : 'blue',
-		lineWidth : 1
-	},
-	editing : {
-		strokeStyle : 'green'
+		miterLimit : 10,
+		
+		//shadows
+		shadowColor: 'rgba(0,0,0,0)',
+		shadowBlur: 0,
+		shadowOffsetX: 0,
+		shadowOffsetY: 0,
 	},
 	/**
 	 * apply this custom style to the 2d context
