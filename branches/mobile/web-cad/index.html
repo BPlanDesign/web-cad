@@ -2,9 +2,10 @@
 <html>
 <head>
 <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>WebDrawing</title>
+<title>WebDrawing touch for mobile device.</title>
 <link type="text/css" rel="stylesheet" href="css/colorPicker.css">
 <link type="text/css" rel="stylesheet" href="css/cad.css">
 <style>
@@ -13,7 +14,7 @@
 
 <body>
 
-<h1>WebCAD</h1>
+<h1>WebCAD touch for mobile device.</h1>
 
 	<div class="cad">
 
@@ -113,6 +114,11 @@
 
 <script type="text/javascript">
 	try {
+		window.onload=function(){
+			document.body.addEventListener("touchstart", function(evt){
+				evt.preventDefault();
+			}, true);
+		};
 		var ctx = new hc.graphic.DrawingContext(document.getElementById('canvas'));
 		var crdLabel=document.getElementById('crd');
 		crdLabel.innerHTML='';
