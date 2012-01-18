@@ -15,6 +15,12 @@ package('hc.graphic');
  */
 hc.graphic.DrawingContext = function(canvasContainer) {
 	//preprocess
+	function preventDefault(evt){
+		evt.preventDefault();
+	};
+	canvasContainer.addEventListener('touchstart',preventDefault,true);
+	canvasContainer.addEventListener('touchmove',preventDefault,true);
+	
 	canvasContainer.addEventListener('selectstart',function(evt){
 		//console.log(evt.type,evt.timeStamp);
 		evt.preventDefault();
@@ -291,7 +297,8 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		ctx.onCursorMove(ctx.crd.x, ctx.crd.y);
 		this.moving=false;
 	};
-
+	
+	tcv.addEventListener('touchmove', tcv.onmousemove, true);
 	tcv.onmousedown = function(evt) {
 		var ctx = this.context;
 		var l=ctx.loc;
@@ -307,6 +314,8 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		//ctx.updateUI();
 	};
 
+	tcv.addEventListener('touchstart', tcv.onmousedown, true);
+	
 	tcv.onmouseup = function(evt) {
 		var ctx=this.context;
 		delete ctx.dragStartLoc;
@@ -319,6 +328,7 @@ hc.graphic.DrawingContext = function(canvasContainer) {
 		}
 		//ctx.updateUI();
 	};
+	tcv.addEventListener('touchend', tcv.onmouseup, true);
 
 	// not support in Firefox
 	tcv.onmousewheel = function(evt) {
