@@ -8,20 +8,27 @@
 <title>WebDrawing touch for mobile device.</title>
 <link type="text/css" rel="stylesheet" href="css/colorPicker.css">
 <link type="text/css" rel="stylesheet" href="css/cad.css">
-<style>
-</style>
 </head>
 
 <body>
 
-<h1>WebCAD touch for mobile device.</h1>
-
 	<div class="cad">
-
-		<div class="control">
+	<div>
+	<div id=crd></div>
+	 <button onclick='ctx.restore()'>Restore</button>
+	 <input id=scale size=5>
+	 <a href='#control'>Control</a>
+	</div>
+		
+		<div id=canvas>
+			<canvas></canvas>
+			<canvas></canvas>
+		</div>
+		
+		<div class="control" id='control'>
 
 			<div>
-				<h4>Elements</h4>
+				<h4>Elements <a href='#crd'>Back</a></h4>
 				<!-- <button onclick="ctx.setMode('view');">View</button>
 				<button onclick="ctx.setMode('select');">Select</button> -->
 				<button onclick="ctx.drawUsing(hc.graphic.Line.creator)" title="Draw a path, press mouse to add a point to the path. Press C to end path, alt+C to close path.">Line</button>
@@ -86,23 +93,12 @@
 				</select> </label>
 			</div>
 
-			<div>
-				<h4>Outline</h4>
-				<canvas id='outline' title="Outline of the canvas."
-					style="border: 1px #CF0 solid; width: 300px; height: 300px;"></canvas>
-			</div>
-
-		</div>
-		
-		<div><div id=crd></div> <button onclick='ctx.restore()'>Restore</button> <input type=range id=scale /></div>
-		<div id=canvas>
-			<canvas></canvas>
-			<canvas></canvas>
 		</div>
 	</div>
 	<p>
 		Scroll the wheel to scale the whole graph. Hold ctrl key and drag to move the whole graph.
 	</p>
+	<p>Tested display:480*320</p>
 </body>
 <script src="js/core.js"></script>
 <script src="js/colorPicker.js"></script>
@@ -114,11 +110,6 @@
 
 <script type="text/javascript">
 	try {
-		window.onload=function(){
-			document.body.addEventListener("touchstart", function(evt){
-				evt.preventDefault();
-			}, true);
-		};
 		var ctx = new hc.graphic.DrawingContext(document.getElementById('canvas'));
 		var crdLabel=document.getElementById('crd');
 		crdLabel.innerHTML='';
